@@ -74,7 +74,7 @@ class sauceondemand_settings_mform extends moodleform {
     public function set_data() {
         $data = array();
         foreach ($this->values as $fieldname => $type) {
-            $data[$fieldname] = get_config($fieldname, 'local_sauceondemand');
+            $data[$fieldname] = get_config('local_sauceondemand', $fieldname);
         }
         parent::set_data($data);
     }
