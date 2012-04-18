@@ -86,8 +86,6 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
         $this->setAccessKey($this->saucelabstoken);
         $this->setBrowserUrl($CFG->wwwroot);
 
-        $this->open("/");
-        $this->waitForPageToLoad("60000");
     }
 
     /**
