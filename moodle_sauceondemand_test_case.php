@@ -66,48 +66,106 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
 
         parent::__construct();
 
-        $this->testloginusername = get_config('local_sauceondemand', 'testusername');
-        $this->testloginpassword = get_config('local_sauceondemand', 'testuserpass');
+        $this->testadminusername = get_config('local_sauceondemand', 'testusername');
+        $this->testadminuserpass = get_config('local_sauceondemand', 'testuserpass');
+        $this->testteacherusername = get_config('local_sauceondemand', 'testusername');
+        $this->testteacheruserpass = get_config('local_sauceondemand', 'testuserpass');
+        $this->teststudentusername = get_config('local_sauceondemand', 'testusername');
+        $this->teststudentuserpass = get_config('local_sauceondemand', 'testuserpass');
+
         $this->saucelabsusername = get_config('local_sauceondemand', 'saucelabsusername');
         $this->saucelabstoken    = get_config('local_sauceondemand', 'saucelabstoken');
 
-        if (empty($this->testloginusername) ||
-            empty($this->testloginpassword) ||
-            empty($this->saucelabsusername) ||
+        if (empty($this->saucelabsusername) ||
             empty($this->saucelabstoken) ) {
 
-            die('Config variables missing - you need all 4!');
+            die('Config variables missing - you need sauce labs details!');
         }
 
         $this->setUsername($this->saucelabsusername);
         $this->setAccessKey($this->saucelabstoken);
         $this->setBrowserUrl($CFG->wwwroot);
 
+        $this->open("/");
+        $this->waitForPageToLoad("60000");
     }
 
     /**
-     * Loads the main page of the site, then logs in. This one is specific to Exeter's OCM test
-     * site, where we need to bypass the single-sign-on
+     * Assuming that all pages have the logout link
+     *
+     * @return bool
      */
-    protected function log_in_to_moodle_with_alternative_link() {
-        $this->open("/");
+    protected function is_logged_in() {
+        return !$this->isElementPresent('link=Logout');
+    }
+
+    /**
+     * Logs the user out so we can switch users
+     *
+     * @return bool
+     */
+    protected function log_out() {
+        if ($this->isElementPresent('link=Logout')) {
+            $this->click('link=Logout');
+            $this->waitForPageToLoad("60000");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Loads the main page of the site, then logs in.
+     *
+     * @param string $url In case we have a custom login page
+     */
+    protected function log_in_as_admin($url = "/login/index.php") {
+
+        if ($this->is_logged_in()) {
+            $this->log_out();
+        }
+
+        $this->open($url);
         $this->waitForPageToLoad("60000");
-        $this->click("link=Alternative Login");
-        $this->waitForPageToLoad("60000");
-        $this->type("id=username", $this->testloginusername);
-        $this->type("id=password", $this->testloginpassword);
+        $this->type("id=username", $this->testadminusername);
+        $this->type("id=password", $this->testadminusername);
         $this->click("id=loginbtn");
         $this->waitForPageToLoad("60000");
     }
 
     /**
      * Loads the main page of the site, then logs in.
+     *
+     * @param string $url In case we have a custom login page
      */
-    protected function log_in_to_moodle() {
-        $this->open("/login/index.php");
+    protected function log_in_as_teacher($url = "/login/index.php") {
+
+        if ($this->is_logged_in()) {
+            $this->log_out();
+        }
+
+        $this->open($url);
         $this->waitForPageToLoad("60000");
-        $this->type("id=username", $this->testloginusername);
-        $this->type("id=password", $this->testloginpassword);
+        $this->type("id=username", $this->testteacherusername);
+        $this->type("id=password", $this->testteacheruserpass);
+        $this->click("id=loginbtn");
+        $this->waitForPageToLoad("60000");
+    }
+
+    /**
+     * Loads the main page of the site, then logs in.
+     *
+     * @param string $url In case we have a custom login page
+     */
+    protected function log_in_as_student($url = "/login/index.php") {
+
+        if ($this->is_logged_in()) {
+            $this->log_out();
+        }
+
+        $this->open($url);
+        $this->waitForPageToLoad("60000");
+        $this->type("id=username", $this->teststudentusername);
+        $this->type("id=password", $this->teststudentuserpass);
         $this->click("id=loginbtn");
         $this->waitForPageToLoad("60000");
     }

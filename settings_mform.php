@@ -36,8 +36,12 @@ class sauceondemand_settings_mform extends moodleform {
     /**
      * @var array List of the names of the config vars
      */
-    protected $values = array('testusername' => 'text',
-                              'testuserpass' => 'passwordunmask',
+    protected $values = array('testadminusername' => 'text',
+                              'testadminuserpass' => 'passwordunmask',
+                              'testteacherusername' => 'text',
+                              'testteacheruserpass' => 'passwordunmask',
+                              'teststudentusername' => 'text',
+                              'teststudentuserpass' => 'passwordunmask',
                               'saucelabsusername' => 'text',
                               'saucelabstoken' => 'text');
 
