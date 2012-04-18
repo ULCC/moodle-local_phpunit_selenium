@@ -120,6 +120,13 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
      */
     protected function log_in_as_admin($url = "/login/index.php") {
 
+        if (empty($this->testadminusername) ||
+            empty($this->testadminusername)
+        ) {
+
+            die('Config variables missing - you need admin login details!');
+        }
+
         if ($this->is_logged_in()) {
             $this->log_out();
         }
@@ -139,6 +146,13 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
      */
     protected function log_in_as_teacher($url = "/login/index.php") {
 
+        if (empty($this->testteacherusername) ||
+            empty($this->testteacheruserpass)
+        ) {
+
+            die('Config variables missing - you need teacher login details!');
+        }
+
         if ($this->is_logged_in()) {
             $this->log_out();
         }
@@ -157,6 +171,13 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
      * @param string $url In case we have a custom login page
      */
     protected function log_in_as_student($url = "/login/index.php") {
+
+        if (empty($this->teststudentusername) ||
+            empty($this->teststudentuserpass)
+        ) {
+
+            die('Config variables missing - you need student login details!');
+        }
 
         if ($this->is_logged_in()) {
             $this->log_out();
