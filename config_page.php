@@ -48,6 +48,7 @@ if (!empty($fromform) and confirm_sesskey()) {
     echo $OUTPUT->notification(get_string('changessaved'), 'notifysuccess');
 }
 
+$settingsform->set_data();
 $settingsform->display();
 
 echo $OUTPUT->footer();
