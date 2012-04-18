@@ -62,19 +62,26 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
      */
     public function __construct() {
 
-        $this->testloginusername = get_config('testusername', 'local_sauceondemand');
-        $this->testloginpassword = get_config('testuserpass', 'local_sauceondemand');
-        $this->saucelabsusername = get_config('saucelabsusername', 'local_sauceondemand');
-        $this->saucelabstoken    = get_config('saucelabstoken', 'local_sauceondemand');
+        global $CFG;
+
+        parent::__construct();
+
+        $this->testloginusername = get_config('local_sauceondemand', 'testusername');
+        $this->testloginpassword = get_config('local_sauceondemand', 'testuserpass');
+        $this->saucelabsusername = get_config('local_sauceondemand', 'saucelabsusername');
+        $this->saucelabstoken    = get_config('local_sauceondemand', 'saucelabstoken');
 
         if (empty($this->testloginusername) ||
             empty($this->testloginpassword) ||
             empty($this->saucelabsusername) ||
-            empty($this->saucelabstoken)
-            ) {
+            empty($this->saucelabstoken) ) {
 
             die('Config variables missing - you need all 4!');
         }
+
+        $this->setUsername($this->saucelabsusername);
+        $this->setAccessKey($this->saucelabstoken);
+        $this->setBrowserUrl($CFG->wwwroot);
 
     }
 
