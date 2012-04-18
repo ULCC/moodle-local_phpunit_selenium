@@ -67,6 +67,15 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
         $this->saucelabsusername = get_config('saucelabsusername', 'local_sauceondemand');
         $this->saucelabstoken    = get_config('saucelabstoken', 'local_sauceondemand');
 
+        if (empty($this->testloginusername) ||
+            empty($this->testloginpassword) ||
+            empty($this->saucelabsusername) ||
+            empty($this->saucelabstoken)
+            ) {
+
+            die('Config variables missing - you need all 4!');
+        }
+
     }
 
     /**
