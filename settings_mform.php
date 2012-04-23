@@ -15,23 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SauceOnDemand unit test plugin
+ * phpunit_selenium unit test plugin
  *
  * @package    local
- * @subpackage sauceondemand
+ * @subpackage phpunit_selenium
  * @copyright  2012 ULCC {@link http://ulcc.ac.uk}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+
 global $CFG;
 require_once($CFG->dirroot.'/lib/formslib.php');
+// For constants
+require_once $CFG->dirroot.'/local/phpunit_selenium/moodle_phpunit_selenium_test_case.php';
 
 /**
  * Form to allow settings for Sauce onDemand to be stored
  */
-class sauceondemand_settings_mform extends moodleform {
+class phpunit_selenium_settings_mform extends moodleform {
 
     /**
      * @var array List of the names of the config vars
@@ -66,26 +69,29 @@ class sauceondemand_settings_mform extends moodleform {
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 
         // Connection details for saucelabs
-         $mform->addElement('text', 'saucelabsusername',
+        $mform->addElement('text', 'saucelabsusername',
                             get_string('saucelabsusername', 'local_phpunit_selenium'),
                             $textattributes);
-         $mform->addElement('text', 'saucelabstoken',
+        $mform->addElement('text', 'saucelabstoken',
                             get_string('saucelabstoken', 'local_phpunit_selenium'),
                             $textattributes);
+        $mform->disabledIf('saucelabsusername', 'sauceorlocal', PHPUNIT_SELENIUM_USE_LOCAL);
+        $mform->disabledIf('saucelabstoken', 'sauceorlocal', PHPUNIT_SELENIUM_USE_LOCAL);
+
 
         // Connection details for local
-        $mform->addElement('text', 'saucelabstoken',
-                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+        $mform->addElement('text', 'localseleniumhost',
+                           get_string('localseleniumhost', 'local_phpunit_selenium'),
                            $textattributes);
-        $mform->addElement('text', 'saucelabstoken',
-                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+        $mform->addElement('text', 'localseleniumport',
+                           get_string('localseleniumport', 'local_phpunit_selenium'),
                            $textattributes);
-        $mform->addElement('text', 'saucelabstoken',
-                           get_string('saucelabstoken', 'local_phpunit_selenium'),
-                           $textattributes);
-        $mform->addElement('text', 'saucelabstoken',
-                           get_string('saucelabstoken', 'local_phpunit_selenium'),
-                           $textattributes);
+//        $mform->addElement('text', 'saucelabstoken',
+//                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+//                           $textattributes);
+//        $mform->addElement('text', 'saucelabstoken',
+//                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+//                           $textattributes);
 
 
         $this->add_action_buttons();
@@ -97,9 +103,23 @@ class sauceondemand_settings_mform extends moodleform {
      */
     public function save_data($data) {
 
+        $otherstuff = array('sauceorlocal',
+                            'saucelabsusername',
+                            'saucelabstoken',
+                            'localseleniumhost',
+                            'localseleniumport');
+
+        foreach ($otherstuff as $fieldname) {
+            if (isset($data->$fieldname)) {
+                set_config($fieldname, $data->$fieldname, 'local_phpunit_selenium');
+            }
+        }
+
         foreach ($this->values as $fieldname => $type) {
             set_config($fieldname, $data->$fieldname, 'local_phpunit_selenium');
         }
+
+
     }
 
     /**
@@ -112,6 +132,10 @@ class sauceondemand_settings_mform extends moodleform {
         }
 
         $data['sauceorlocal'] = get_config('local_phpunit_selenium', 'sauceorlocal');
+        $data['saucelabsusername'] = get_config('local_phpunit_selenium', 'saucelabsusername');
+        $data['saucelabstoken'] = get_config('local_phpunit_selenium', 'saucelabstoken');
+        $data['localseleniumhost'] = get_config('local_phpunit_selenium', 'localseleniumhost');
+        $data['localseleniumport'] = get_config('local_phpunit_selenium', 'localseleniumport');
 
         parent::set_data($data);
     }

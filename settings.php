@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SauceOnDemand unit test plugin
+ * phpunit_selenium unit test plugin
  *
  * @package    local
- * @subpackage sauceondemand
+ * @subpackage phpunit_selenium
  * @copyright  2012 ULCC {@link http://ulcc.ac.uk}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 if ($hassiteconfig) { // needs this condition or there is error on login page
     $ADMIN->add('development', new admin_externalpage('local_phpunit_selenium',
         get_string('pluginname', 'local_phpunit_selenium'),
-        new moodle_url('/local/sauceondemand/config_page.php')));
+        new moodle_url('/local/phpunit_selenium/config_page.php')));
 }
 
 

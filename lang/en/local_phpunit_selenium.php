@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SauceOnDemand unit test plugin
+ * phpunit_selenium unit test plugin
  *
  * @package    local
- * @subpackage sauceondemand
+ * @subpackage phpunit_selenium
  * @copyright  2012 ULCC {@link http://ulcc.ac.uk}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,3 +35,7 @@ $string['saucelabsusername'] = 'Sauce Labs username';
 $string['saucelabstoken'] = 'Sauce Labs API token (from your profile)';
 $string['saucelabs'] = 'Sauce Labs';
 $string['localnetwork'] = 'Local network';
+$string['localseleniumhost'] = 'Hostname or ip of the machine that\'s running selenium RC';
+$string['localseleniumport'] = 'Post that the Selenium RC is running on';
+$string['testdirectory'] = 'Directory containing PHPUnit test files';
+$string['notadirectory'] = 'This is not a valid directory';

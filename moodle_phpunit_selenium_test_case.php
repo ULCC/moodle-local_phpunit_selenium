@@ -33,13 +33,15 @@ define('PHPUNIT_SELENIUM_USE_SAUCELABS', 1);
  */
 define('PHPUNIT_SELENIUM_USE_LOCAL', 0);
 
+defined('MOODLE_INTERNAL') || die();
+
 // Use Pear to install these packages and make sure the Pear include path is added to php.ini
 // TODO use the Moodle lib version in 2.3
 require_once 'PHPUnit/Autoload.php';
 require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
-require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase.php';
-require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase/Driver.php';
+//require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase.php';
+//require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase/Driver.php';
 
 
 /**
@@ -120,6 +122,11 @@ class moodle_phpunit_selenium_test_case extends PHPUnit_Extensions_SeleniumTestC
     protected $usingsaucelabs;
 
     /**
+     * @var array Prevents errors due to multiple destruction of copies of DB
+     */
+    protected $backupGlobalsBlacklist = array('DB');
+
+    /**
      * @var array
      */
     public static $browsers = array(
@@ -153,6 +160,8 @@ class moodle_phpunit_selenium_test_case extends PHPUnit_Extensions_SeleniumTestC
 //        )
     );
 
+
+
     /**
      * Construtor needs to grab the config variables that allow the test user account to
      * log into Moodle and feed them into the saucelabs config stuff.
@@ -169,12 +178,6 @@ class moodle_phpunit_selenium_test_case extends PHPUnit_Extensions_SeleniumTestC
         $this->usingsaucelabs = $sauceorlocal == PHPUNIT_SELENIUM_USE_SAUCELABS;
 
 
-
-        $this->testadminusername = get_config('local_phpunit_selenium', 'testadminusername');
-        $this->testadminuserpass = get_config('local_phpunit_selenium', 'testadminuserpass');
-        $this->testadminid = $DB->get_field('user', 'id',
-                                             array('username' =>
-                                             $this->testadminusername));
 
         $this->testteacherusername = get_config('local_phpunit_selenium', 'testteacherusername');
         $this->testteacheruserpass = get_config('local_phpunit_selenium', 'testteacheruserpass');
@@ -198,12 +201,12 @@ class moodle_phpunit_selenium_test_case extends PHPUnit_Extensions_SeleniumTestC
 
         // Can't set static stuff dynamically. Not sure this matters
         if (!$this->usingsaucelabs) {
-            $host = get_config('local_phpunit_selenium', 'localseleniumhost');
-            $port = get_config('local_phpunit_selenium', 'localseleniumport');
+            $this->host = get_config('local_phpunit_selenium', 'localseleniumhost');
+            $this->port = get_config('local_phpunit_selenium', 'localseleniumport');
 
             //foreach (self::$browsers as &$browser) {
-            $this->setHost($host);
-            $this->setPort((int)$port);
+            $this->setHost($this->host);
+            $this->setPort((int)$this->port);
             // }
 
         }
@@ -282,6 +285,8 @@ class moodle_phpunit_selenium_test_case extends PHPUnit_Extensions_SeleniumTestC
      * @internal param string $url In case we have a custom login page
      */
     protected function log_in_as_admin() {
+
+        global $DB;
 
         $this->assertNotEmpty($this->testadminusername, 'Admin username missing');
         $this->assertNotEmpty($this->testadminuserpass, 'Admin password missing');

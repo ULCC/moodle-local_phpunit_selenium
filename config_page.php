@@ -15,28 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SauceOnDemand unit test plugin
+ * phpunit_selenium unit test plugin
  *
  * @package    local
- * @subpackage sauceondemand
+ * @subpackage phpunit_selenium
  * @copyright  2012 ULCC {@link http://ulcc.ac.uk}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(__FILE__).'../../../config.php');
 global $CFG, $OUTPUT, $PAGE;
-require_once($CFG->dirroot.'/local/sauceondemand/settings_mform.php');
+require_once($CFG->dirroot.'/local/phpunit_selenium/settings_mform.php');
 
 require_login(1);
 require_capability('report/unittest:view', get_system_context());
 
-$PAGE->set_url('/local/sauceondemand/config_page.php');
+$PAGE->set_url('/local/phpunit_selenium/config_page.php');
 $PAGE->set_pagelayout('standard');
-$title = 'SauceOnDemand settings';
+$title = 'phpunit_selenium settings';
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-$settingsform = new sauceondemand_settings_mform();
+$settingsform = new phpunit_selenium_settings_mform();
 $fromform = $settingsform->get_data();
 
 echo $OUTPUT->header();
