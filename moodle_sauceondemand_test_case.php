@@ -25,6 +25,7 @@
 
 // Use Pear to install these packages and make sure the Pear include path is added to php.ini
 // TODO use the Moodle lib version in 2.3
+require_once 'PHPUnit/Autoload.php';
 require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase.php';
@@ -34,17 +35,53 @@ require_once 'PHPUnit/Extensions/SeleniumTestCase/SauceOnDemandTestCase/Driver.p
  * This class will take the config settings and load them up ready for the tests to all run when
  * this class is extended.
  */
-class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase_SauceOnDemandTestCase {
+//class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase_SauceOnDemandTestCase {
+class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase {
 
     /**
-     * @var string The username used for the test script to log into the site
+     * @var string The username used for the test script to log into the site as admin
      */
-    protected $testloginusername;
+    protected $testadminusername;
 
     /**
-     * @var string The password used for the test script to log into the site
+     * @var string The password used for the test script to log into the site as admin
      */
-    protected $testloginpassword;
+    protected $testadminpassword;
+
+    /**
+     * @var mixed Moodle id of the test admin account. Used to tell if we are logged in as admin
+     */
+    protected $testadminid;
+
+    /**
+     * @var string The username used for the test script to log into the site as a teacher
+     */
+    protected $testteacherusername;
+
+    /**
+     * @var string The password used for the test script to log into the site as a teacher
+     */
+    protected $testteacherpassword;
+
+    /**
+     * @var mixed Moodle id of the test teacher account. Used to tell if we are logged in as a teacher
+     */
+    protected $testteacherid;
+
+    /**
+     * @var string The username used for the test script to log into the site as a student
+     */
+    protected $teststudentusername;
+
+    /**
+     * @var string The password used for the test script to log into the site as a student
+     */
+    protected $teststudentpassword;
+
+    /**
+     * @var mixed Moodle id of the test teacher account. Used to tell if we are logged in as a student
+     */
+    protected $teststudentid;
 
     /**
      * @var string Username on the saucelabs site
@@ -57,24 +94,45 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
     protected $saucelabstoken;
 
     /**
+     * @var string Standard login url which can be overridden if SSO is in use and needs bypassing
+     */
+    protected $loginurl = "/login/index.php";
+
+    /**
      * Construtor needs to grab the config variables that allow the test user account to
      * log into Moodle and feed them into the saucelabs config stuff.
      */
     public function __construct() {
 
-        global $CFG;
+        global $CFG, $DB;
 
         parent::__construct();
 
-        $this->testadminusername = get_config('local_sauceondemand', 'testusername');
-        $this->testadminuserpass = get_config('local_sauceondemand', 'testuserpass');
-        $this->testteacherusername = get_config('local_sauceondemand', 'testusername');
-        $this->testteacheruserpass = get_config('local_sauceondemand', 'testuserpass');
-        $this->teststudentusername = get_config('local_sauceondemand', 'testusername');
-        $this->teststudentuserpass = get_config('local_sauceondemand', 'testuserpass');
+        $this->testadminusername = get_config('local_phpunit_selenium', 'testadminusername');
+        $this->testadminuserpass = get_config('local_phpunit_selenium', 'testadminuserpass');
+        $this->testadminid = $DB->get_field('user', 'id',
+                                             array('username' =>
+                                             $this->testadminusername));
 
-        $this->saucelabsusername = get_config('local_sauceondemand', 'saucelabsusername');
-        $this->saucelabstoken    = get_config('local_sauceondemand', 'saucelabstoken');
+        $this->testteacherusername = get_config('local_phpunit_selenium', 'testteacherusername');
+        $this->testteacheruserpass = get_config('local_phpunit_selenium', 'testteacheruserpass');
+        $this->testadminid = $DB->get_field('user', 'id',
+                                            array('username' =>
+                                            $this->testteacherusername));
+
+        $this->teststudentusername = get_config('local_phpunit_selenium', 'teststudentusername');
+        $this->teststudentuserpass = get_config('local_phpunit_selenium', 'teststudentuserpass');
+        $this->testadminid = $DB->get_field('user', 'id',
+                                            array('username' =>
+                                            $this->teststudentusername));
+
+        $this->testcourseshortname = get_config('local_phpunit_selenium', 'testcourseshortname');
+        $this->testcourseid = $DB->get_field('course', 'id',
+                                             array('shortname' =>
+                                                   $this->testcourseshortname));
+
+        $this->saucelabsusername = get_config('local_phpunit_selenium', 'saucelabsusername');
+        $this->saucelabstoken    = get_config('local_phpunit_selenium', 'saucelabstoken');
 
         if (empty($this->saucelabsusername) ||
             empty($this->saucelabstoken) ) {
@@ -97,6 +155,13 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
         return !$this->isElementPresent('link=Logout');
     }
 
+    protected function turn_editing_on() {
+        if (!$this->isElementPresent('link=Turn editing off')) {
+            $this->click('link=Logout');
+            $this->waitForPageToLoad("60000");
+        }
+    }
+
     /**
      * Logs the user out so we can switch users
      *
@@ -112,24 +177,42 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
     }
 
     /**
+     * Extracts the user id from the logout link so we know who we are
+     *
+     * @return int
+     */
+    protected function get_logged_in_user_id() {
+        $id = 0;
+        if ($this->isElementPresent("div[@id='page - footer']/div[@class='logininfo']/a[1]")) {
+            $link = $this->getAttribute("div[@id='page - footer']/div[@class='logininfo']/a[1]@href");
+            $matches = array();
+            if (preg_match('#(\d+)$#', $link, $matches)) {
+                $id = $matches[1];
+            }
+        }
+        return $id;
+    }
+
+    /**
      * Loads the main page of the site, then logs in.
      *
-     * @param string $url In case we have a custom login page
+     * @internal param string $url In case we have a custom login page
      */
-    protected function log_in_as_admin($url = "/login/index.php") {
+    protected function log_in_as_admin() {
 
-        if (empty($this->testadminusername) ||
-            empty($this->testadminusername)
-        ) {
+        $this->assertNotEmpty($this->testadminusername);
+        $this->assertNotEmpty($this->testadminusername);
 
-            die('Config variables missing - you need admin login details!');
-        }
-
+        // Might already be logged in, but as not-admin
         if ($this->is_logged_in()) {
-            $this->log_out();
+            if ($this->get_logged_in_user_id() == $this->testadminid) {
+                return;
+            } else {
+                $this->log_out();
+            }
         }
 
-        $this->open($url);
+        $this->open($this->loginurl);
         $this->waitForPageToLoad("60000");
         $this->type("id=username", $this->testadminusername);
         $this->type("id=password", $this->testadminusername);
@@ -140,22 +223,22 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
     /**
      * Loads the main page of the site, then logs in.
      *
-     * @param string $url In case we have a custom login page
+     * @internal param string $url In case we have a custom login page
      */
-    protected function log_in_as_teacher($url = "/login/index.php") {
+    protected function log_in_as_teacher() {
 
-        if (empty($this->testteacherusername) ||
-            empty($this->testteacheruserpass)
-        ) {
-
-            die('Config variables missing - you need teacher login details!');
-        }
+        $this->assertNotEmpty($this->testteacherusername);
+        $this->assertNotEmpty($this->testteacheruserpass);
 
         if ($this->is_logged_in()) {
-            $this->log_out();
+            if ($this->get_logged_in_user_id() == $this->testteacherid) {
+                return;
+            } else {
+                $this->log_out();
+            }
         }
 
-        $this->open($url);
+        $this->open($this->loginurl);
         $this->waitForPageToLoad("60000");
         $this->type("id=username", $this->testteacherusername);
         $this->type("id=password", $this->testteacheruserpass);
@@ -166,22 +249,22 @@ class moodle_sauceondemand_test_case extends PHPUnit_Extensions_SeleniumTestCase
     /**
      * Loads the main page of the site, then logs in.
      *
-     * @param string $url In case we have a custom login page
+     * @internal param string $url In case we have a custom login page
      */
-    protected function log_in_as_student($url = "/login/index.php") {
+    protected function log_in_as_student() {
 
-        if (empty($this->teststudentusername) ||
-            empty($this->teststudentuserpass)
-        ) {
-
-            die('Config variables missing - you need student login details!');
-        }
+        $this->assertNotEmpty($this->teststudentusername);
+        $this->assertNotEmpty($this->teststudentuserpass);
 
         if ($this->is_logged_in()) {
-            $this->log_out();
+            if ($this->get_logged_in_user_id() == $this->teststudentid) {
+                return;
+            } else {
+                $this->log_out();
+            }
         }
 
-        $this->open($url);
+        $this->open($this->loginurl);
         $this->waitForPageToLoad("60000");
         $this->type("id=username", $this->teststudentusername);
         $this->type("id=password", $this->teststudentuserpass);

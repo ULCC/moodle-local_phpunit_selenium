@@ -42,8 +42,7 @@ class sauceondemand_settings_mform extends moodleform {
                               'testteacheruserpass' => 'passwordunmask',
                               'teststudentusername' => 'text',
                               'teststudentuserpass' => 'passwordunmask',
-                              'saucelabsusername' => 'text',
-                              'saucelabstoken' => 'text');
+                              'testcourseshortname' => 'text');
 
     public function definition() {
 
@@ -54,9 +53,40 @@ class sauceondemand_settings_mform extends moodleform {
         // All of them are text fields right now. Can expand by making it name => type
         foreach ($this->values as $fieldname => $type) {
                     $mform->addElement($type, $fieldname,
-                                       get_string($fieldname, 'local_sauceondemand'),
+                                       get_string($fieldname, 'local_phpunit_selenium'),
                                        $textattributes);
         }
+
+        // Use saucelabs or local? Radio creation is more awkward, so it's not in the loop
+        $radioarray = array();
+        $radioarray[] = &
+            MoodleQuickForm::createElement('radio', 'sauceorlocal', '', get_string('saucelabs', 'local_phpunit_selenium'), 1);
+        $radioarray[] = &
+            MoodleQuickForm::createElement('radio', 'sauceorlocal', '', get_string('localnetwork', 'local_phpunit_selenium'), 0);
+        $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
+
+        // Connection details for saucelabs
+         $mform->addElement('text', 'saucelabsusername',
+                            get_string('saucelabsusername', 'local_phpunit_selenium'),
+                            $textattributes);
+         $mform->addElement('text', 'saucelabstoken',
+                            get_string('saucelabstoken', 'local_phpunit_selenium'),
+                            $textattributes);
+
+        // Connection details for local
+        $mform->addElement('text', 'saucelabstoken',
+                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+                           $textattributes);
+        $mform->addElement('text', 'saucelabstoken',
+                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+                           $textattributes);
+        $mform->addElement('text', 'saucelabstoken',
+                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+                           $textattributes);
+        $mform->addElement('text', 'saucelabstoken',
+                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+                           $textattributes);
+
 
         $this->add_action_buttons();
     }
@@ -68,7 +98,7 @@ class sauceondemand_settings_mform extends moodleform {
     public function save_data($data) {
 
         foreach ($this->values as $fieldname => $type) {
-            set_config($fieldname, $data->$fieldname, 'local_sauceondemand');
+            set_config($fieldname, $data->$fieldname, 'local_phpunit_selenium');
         }
     }
 
@@ -78,8 +108,11 @@ class sauceondemand_settings_mform extends moodleform {
     public function set_data() {
         $data = array();
         foreach ($this->values as $fieldname => $type) {
-            $data[$fieldname] = get_config('local_sauceondemand', $fieldname);
+            $data[$fieldname] = get_config('local_phpunit_selenium', $fieldname);
         }
+
+        $data['sauceorlocal'] = get_config('local_phpunit_selenium', 'sauceorlocal');
+
         parent::set_data($data);
     }
 }

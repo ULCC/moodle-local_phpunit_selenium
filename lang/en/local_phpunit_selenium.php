@@ -23,8 +23,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'SauceOnDemand Unit tests';
-$string['testusername'] = 'Test account username for this site';
-$string['testuserpass'] = 'Test account password for this site';
+$string['pluginname'] = 'PHPUnit Selenium';
+$string['testadminusername'] = 'Test admin account username for this site';
+$string['testadminuserpass'] = 'Test admin account password for this site';
+$string['testteacherusername'] = 'Test teacher account username for this site';
+$string['testteacheruserpass'] = 'Test teacher account password for this site';
+$string['teststudentusername'] = 'Test student account username for this site';
+$string['teststudentuserpass'] = 'Test student account password for this site';
+$string['testcourseshortname'] = 'Course where unit tests can create and destroy things without interfering with the rest of the site.';
 $string['saucelabsusername'] = 'Sauce Labs username';
 $string['saucelabstoken'] = 'Sauce Labs API token (from your profile)';
+$string['saucelabs'] = 'Sauce Labs';
+$string['localnetwork'] = 'Local network';

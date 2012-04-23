@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) { // needs this condition or there is error on login page
-    $ADMIN->add('development', new admin_externalpage('local_sauceondemand',
-        get_string('pluginname', 'local_sauceondemand'),
+    $ADMIN->add('development', new admin_externalpage('local_phpunit_selenium',
+        get_string('pluginname', 'local_phpunit_selenium'),
         new moodle_url('/local/sauceondemand/config_page.php')));
 }
 
