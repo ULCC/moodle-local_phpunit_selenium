@@ -28,7 +28,7 @@ global $CFG, $OUTPUT, $PAGE;
 require_once($CFG->dirroot.'/local/phpunit_selenium/settings_mform.php');
 
 require_login(1);
-require_capability('report/unittest:view', get_system_context());
+require_capability('tool/unittest:execute', context_system::instance());
 
 $PAGE->set_url('/local/phpunit_selenium/config_page.php');
 $PAGE->set_pagelayout('standard');
@@ -44,7 +44,7 @@ echo $OUTPUT->header();
 if (!empty($fromform) and confirm_sesskey()) {
 
     $settingsform->save_data($fromform);
-    //display confirmation
+    // Display confirmation.
     echo $OUTPUT->notification(get_string('changessaved'), 'notifysuccess');
 }
 
