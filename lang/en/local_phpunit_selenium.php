@@ -36,6 +36,6 @@ $string['saucelabstoken'] = 'Sauce Labs API token (from your profile)';
 $string['saucelabs'] = 'Sauce Labs';
 $string['localnetwork'] = 'Local network';
 $string['localseleniumhost'] = 'Hostname or ip of the machine that\'s running selenium RC';
-$string['localseleniumport'] = 'Post that the Selenium RC is running on';
+$string['localseleniumport'] = 'Port that the Selenium RC is running on';
 $string['testdirectory'] = 'Directory containing PHPUnit test files';
 $string['notadirectory'] = 'This is not a valid directory';
