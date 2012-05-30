@@ -25,11 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 global $CFG;
 require_once($CFG->dirroot.'/lib/formslib.php');
-// For constants
-require_once $CFG->dirroot.'/local/phpunit_selenium/moodle_phpunit_selenium_test_case.php';
+// For constants.
+require_once($CFG->dirroot.'/local/phpunit_selenium/moodle_phpunit_selenium_test_case.php');
 
 /**
  * Form to allow settings for Sauce onDemand to be stored
@@ -47,52 +46,45 @@ class phpunit_selenium_settings_mform extends moodleform {
                               'teststudentuserpass' => 'passwordunmask',
                               'testcourseshortname' => 'text');
 
-    public function definition() {
+    protected function definition() {
 
         $mform =& $this->_form;
 
         $textattributes = array('size' => '20');
 
-        // All of them are text fields right now. Can expand by making it name => type
+        // All of them are text fields right now. Can expand by making it name => type.
         foreach ($this->values as $fieldname => $type) {
-                    $mform->addElement($type, $fieldname,
-                                       get_string($fieldname, 'local_phpunit_selenium'),
-                                       $textattributes);
+            $mform->addElement($type, $fieldname,
+                               get_string($fieldname, 'local_phpunit_selenium'),
+                               $textattributes);
         }
 
-        // Use saucelabs or local? Radio creation is more awkward, so it's not in the loop
+        // Use saucelabs or local? Radio creation is more awkward, so it's not in the loop.
         $radioarray = array();
-        $radioarray[] = &
-            MoodleQuickForm::createElement('radio', 'sauceorlocal', '', get_string('saucelabs', 'local_phpunit_selenium'), 1);
-        $radioarray[] = &
-            MoodleQuickForm::createElement('radio', 'sauceorlocal', '', get_string('localnetwork', 'local_phpunit_selenium'), 0);
+        $radioarray[] = &MoodleQuickForm::createElement('radio', 'sauceorlocal', '',
+                                                        get_string('saucelabs',
+                                                                   'local_phpunit_selenium'), 1);
+        $radioarray[] = & MoodleQuickForm::createElement('radio', 'sauceorlocal', '',
+                                           get_string('localnetwork', 'local_phpunit_selenium'), 0);
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 
-        // Connection details for saucelabs
+        // Connection details for saucelabs.
         $mform->addElement('text', 'saucelabsusername',
-                            get_string('saucelabsusername', 'local_phpunit_selenium'),
-                            $textattributes);
+                           get_string('saucelabsusername', 'local_phpunit_selenium'),
+                           $textattributes);
         $mform->addElement('text', 'saucelabstoken',
-                            get_string('saucelabstoken', 'local_phpunit_selenium'),
-                            $textattributes);
+                           get_string('saucelabstoken', 'local_phpunit_selenium'),
+                           $textattributes);
         $mform->disabledIf('saucelabsusername', 'sauceorlocal', PHPUNIT_SELENIUM_USE_LOCAL);
         $mform->disabledIf('saucelabstoken', 'sauceorlocal', PHPUNIT_SELENIUM_USE_LOCAL);
 
-
-        // Connection details for local
+        // Connection details for local.
         $mform->addElement('text', 'localseleniumhost',
                            get_string('localseleniumhost', 'local_phpunit_selenium'),
                            $textattributes);
         $mform->addElement('text', 'localseleniumport',
                            get_string('localseleniumport', 'local_phpunit_selenium'),
                            $textattributes);
-//        $mform->addElement('text', 'saucelabstoken',
-//                           get_string('saucelabstoken', 'local_phpunit_selenium'),
-//                           $textattributes);
-//        $mform->addElement('text', 'saucelabstoken',
-//                           get_string('saucelabstoken', 'local_phpunit_selenium'),
-//                           $textattributes);
-
 
         $this->add_action_buttons();
     }
@@ -118,8 +110,6 @@ class phpunit_selenium_settings_mform extends moodleform {
         foreach ($this->values as $fieldname => $type) {
             set_config($fieldname, $data->$fieldname, 'local_phpunit_selenium');
         }
-
-
     }
 
     /**
